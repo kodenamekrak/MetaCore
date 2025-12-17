@@ -43,11 +43,13 @@ DECLARE_CLASS_CODEGEN(MetaCore, MainThreadScheduler, UnityEngine::MonoBehaviour)
     DECLARE_DEFAULT_CTOR();
 
     DECLARE_INSTANCE_METHOD(void, Update);
+    DECLARE_INSTANCE_METHOD(void, FixedUpdate);
 
    public:
     static void Schedule(std::function<void()> callback);
     static void Schedule(std::function<bool()> wait, std::function<void()> callback);
     static void AddUpdate(std::function<void()> callback);
+    static void AddFixedUpdate(std::function<void()> callback);
 
     template <class T>
     static void Await(T task, std::function<void()> callback) {

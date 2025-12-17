@@ -28,6 +28,8 @@ static std::mutex waitersMutex;
 static std::vector<std::pair<std::function<bool()>, std::function<void()>>> waiters;
 static std::mutex updatesMutex;
 static std::vector<std::function<void()>> updates;
+static std::mutex fixedUpdatesMutex;
+static std::vector<std::function<void()>> fixedUpdates;
 
 void MetaCore::MainThreadScheduler::Update() {
     std::unique_lock waitersLock(waitersMutex);
@@ -62,6 +64,17 @@ void MetaCore::MainThreadScheduler::Update() {
         callback();
 }
 
+void MetaCore::MainThreadScheduler::FixedUpdate() {
+    std::unique_lock fixedUpdatesLock(fixedUpdatesMutex);
+
+    decltype(fixedUpdates) fixedUpdatesCopy = {fixedUpdates.begin(), fixedUpdates.end()};
+
+    fixedUpdatesLock.unlock();
+
+    for(auto& callback : fixedUpdatesCopy)
+        callback();
+}
+
 void MetaCore::MainThreadScheduler::Schedule(std::function<void()> callback) {
     std::unique_lock lock(callbacksMutex);
     callbacks.emplace(std::move(callback));
@@ -75,4 +88,9 @@ void MetaCore::MainThreadScheduler::Schedule(std::function<bool()> wait, std::fu
 void MetaCore::MainThreadScheduler::AddUpdate(std::function<void()> callback) {
     std::unique_lock lock(updatesMutex);
     updates.emplace_back(std::move(callback));
+}
+
+void MetaCore::MainThreadScheduler::AddFixedUpdate(std::function<void()> callback) {
+    std::unique_lock lock(fixedUpdatesMutex);
+    fixedUpdates.emplace_back(std::move(callback));
 }

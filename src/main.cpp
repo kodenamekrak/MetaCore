@@ -1,5 +1,6 @@
 #include "main.hpp"
 
+#include "GlobalNamespace/OVRInput.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "events.hpp"
 #include "hooks.hpp"
@@ -32,4 +33,8 @@ extern "C" METACORE_EXPORT void late_load() {
     auto mainThread = UnityEngine::GameObject::New_ctor("MetaCoreMainThread");
     UnityEngine::Object::DontDestroyOnLoad(mainThread);
     mainThread->AddComponent<MetaCore::MainThreadScheduler*>();
+
+    MetaCore::MainThreadScheduler::AddFixedUpdate([](){
+        GlobalNamespace::OVRInput::FixedUpdate();
+    });
 }
