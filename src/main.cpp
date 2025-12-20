@@ -34,6 +34,10 @@ extern "C" METACORE_EXPORT void late_load() {
     UnityEngine::Object::DontDestroyOnLoad(mainThread);
     mainThread->AddComponent<MetaCore::MainThreadScheduler*>();
 
+    MetaCore::MainThreadScheduler::AddUpdate([](){
+        GlobalNamespace::OVRInput::Update();
+    });
+
     MetaCore::MainThreadScheduler::AddFixedUpdate([](){
         GlobalNamespace::OVRInput::FixedUpdate();
     });
